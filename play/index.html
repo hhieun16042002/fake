@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) r.unregister();
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(k) { caches.delete(k); });
+        });
+      }
+    </script>
+    <!-- Google tag (gtag.js) — đo lường người chơi ẩn danh, sự kiện game gửi qua src/platform/analytics.ts -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DWV6WEB5GR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // nhãn "nhà" để tách số liệu: nhà mới decheviahe.com / nhà cũ pages.dev / app (Android · iOS · máy tính).
+      // App chạy trên cổng riêng (dcvh://) không lưu được cookie → GA dùng mã máy của game làm client_id.
+      (function () {
+        var app = "__TAURI_INTERNALS__" in window, cfg = {}, ua = navigator.userAgent;
+        var plat = !app ? "web" : /android/i.test(ua) ? "android_app" : /iphone|ipad/i.test(ua) ? "ios_app" : "desktop_app";
+        if (app) {
+          var id = null;
+          try {
+            id = localStorage.getItem("de-che-via-he/device");
+            if (!id || !/^[a-z0-9]{16,40}$/.test(id)) {
+              var b = crypto.getRandomValues(new Uint8Array(12));
+              id = Array.prototype.map.call(b, function (x) { return x.toString(36).padStart(2, "0"); }).join("").slice(0, 24);
+              localStorage.setItem("de-che-via-he/device", id);
+            }
+          } catch (e) {}
+          cfg.client_storage = "none";
+          if (id) cfg.client_id = id;
+        }
+        gtag("set", "user_properties", { home: app ? "app" : location.hostname, app_platform: plat });
+        gtag("config", "G-DWV6WEB5GR", cfg);
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <!-- không cho phóng to/thu nhỏ; bàn phím ảo nổi ĐÈ lên game, không co trang lại (interactive-widget) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content" />
+    <title>Chơi Đế Chế Vỉa Hè — Game kinh doanh vỉa hè</title>
+    <meta name="robots" content="noindex, follow" />
+    <meta name="description" content="Chơi Đế Chế Vỉa Hè: bán vé số, mở quầy hàng và làm quen bà con trên phố Hoa Sữa." />
+    <meta name="theme-color" content="#e07a5f" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Đế Chế Vỉa Hè" />
+    <meta name="application-name" content="Đế Chế Vỉa Hè" />
+    <link rel="manifest" href="/play/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/play/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/play/icons/apple-touch-icon.png" />
+    <style>@font-face{font-family:Mali;src:url(/play/fonts/Mali-Bold.ttf)format("truetype");font-weight:700;font-display:block}@font-face{font-family:Mali;src:url(/play/fonts/Mali-SemiBold.ttf)format("truetype");font-weight:600;font-display:block}@font-face{font-family:"Baloo 2";src:url(/play/fonts/Baloo2-Bold.ttf)format("truetype");font-weight:700;font-display:block}html,body{overscroll-behavior:none;touch-action:none;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;background:#2b211b;height:100%;margin:0;overflow:hidden}input{touch-action:manipulation;-webkit-user-select:text;user-select:text;font-size:16px}#app{position:fixed;top:0;bottom:0;left:0;right:0}canvas{display:block}#app canvas{touch-action:none}#safe{pointer-events:none;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);position:fixed;top:0;bottom:0;left:0;right:0}#fps{z-index:5;color:#fff8;pointer-events:none;background:#0006;border-radius:8px;padding:4px 8px;font:12px system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;position:fixed;bottom:10px;right:10px}</style>
+    <script type="module" crossorigin src="/play/assets/index-DdpGnxCm.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="fps"></div>
+    <div id="safe"></div>
+
+    <!-- Mod & Quầy Mới Helper Overlay -->
+    <div id="mod-root" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;">
+      <button id="mod-toggle" style="background:#e07a5f;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <span>🥞 Tiệm Bánh Xèo & Tiện ích</span>
+      </button>
+
+      <div id="mod-panel" style="display:none;margin-top:8px;background:rgba(33,25,15,0.95);border:1px solid #e07a5f88;backdrop-filter:blur(10px);color:#fff;padding:14px;border-radius:14px;width:310px;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-size:13px;line-height:1.5;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #443224;padding-bottom:6px;">
+          <b style="color:#f4a261;font-size:14px;">🏪 Quầy Mới: Bánh Xèo Miền Tây</b>
+          <button id="mod-close" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        <div style="font-size:12px;color:#d0c4b4;margin-bottom:12px;">
+          Đã thêm vào danh mục mở quầy:<br/>
+          • 🥞 <b>Bánh xèo tôm thịt</b> (35k, đĩa rau rừng)<br/>
+          • 🥥 <b>Bánh khọt nước cốt dừa</b> (30k, mỡ hành)<br/>
+          • ⭐ <b>Bánh xèo củ hũ dừa đặc biệt</b> (55k, tier 3)
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+            💰 +1.000.000đ vốn làm ăn
+          </button>
+          <button id="btn-unlock-street" style="background:#e76f51;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+            🔓 Mở khóa vỉa hè mở quán ngay
+          </button>
+          <button id="btn-build-stall" style="background:#e07a5f;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+            🥞 Khai trương ngay Tiệm Bánh Xèo
+          </button>
+          <button id="btn-speed" style="background:#457b9d;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+            ⚡ Tăng tốc độ game x3
+          </button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:#887766;text-align:center;">
+          Bấm "Bắt đầu" vào game rồi sử dụng các nút trên!
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        const toggle = document.getElementById('mod-toggle');
+        const panel = document.getElementById('mod-panel');
+        const close = document.getElementById('mod-close');
+        toggle.addEventListener('click', () => {
+          panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+        close.addEventListener('click', () => {
+          panel.style.display = 'none';
+        });
+
+        document.getElementById('btn-add-money').addEventListener('click', () => {
+          if (window.__game && window.__game.addMoney) {
+            window.__game.addMoney(1000);
+          } else {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+          }
+        });
+
+        document.getElementById('btn-unlock-street').addEventListener('click', () => {
+          if (window.__game && window.__game.unlockStreet) {
+            window.__game.unlockStreet();
+          } else {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+          }
+        });
+
+        document.getElementById('btn-build-stall').addEventListener('click', () => {
+          if (window.__game && window.__game.buildBanhXeo) {
+            window.__game.buildBanhXeo();
+          } else {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+          }
+        });
+
+        let speedFast = false;
+        document.getElementById('btn-speed').addEventListener('click', (e) => {
+          if (window.app && window.app.ticker) {
+            speedFast = !speedFast;
+            window.app.ticker.speed = speedFast ? 3 : 1;
+            e.target.textContent = speedFast ? '⚡ Đang chạy x3 (Bấm để về x1)' : '⚡ Tăng tốc độ game x3';
+          } else {
+            alert('Vui lòng đợi game load xong!');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

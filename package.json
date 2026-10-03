@@ -1,0 +1,18 @@
+{
+  "name": "decheviahe",
+  "version": "1.0.0",
+  "description": "Game mô phỏng kinh doanh vỉa hè Sài Gòn - Đế Chế Vỉa Hè",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "decheviahe",
+    "simulation",
+    "sai-gon"
+  ],
+  "author": "",
+  "license": "ISC"
+}

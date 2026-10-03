@@ -82,6 +82,9 @@
           • ⭐ <b>Bánh xèo củ hũ dừa đặc biệt</b> (55k, tier 3)
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
+          <button id="btn-start-game" style="background:#38b000;color:#fff;border:none;padding:10px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:14px;">
+            ▶ Bắt đầu vào chơi ngay
+          </button>
           <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
             💰 +1.000.000đ vốn làm ăn
           </button>
@@ -101,6 +104,11 @@
       </div>
     </div>
 
+    <!-- Nút Bắt Đầu To Nổi Bật Dành Cho Điện Thoại & Trình Duyệt -->
+    <button id="quick-start-btn" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9998;background:#2d8a4e;color:#fff;border:3px solid #fff;border-radius:30px;padding:12px 28px;font-size:17px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,0.5);cursor:pointer;display:flex;align-items:center;gap:8px;">
+      <span>🎮 BẮT ĐẦU CHƠI NGAY</span>
+    </button>
+
     <script>
       (function() {
         const toggle = document.getElementById('mod-toggle');
@@ -112,6 +120,40 @@
         close.addEventListener('click', () => {
           panel.style.display = 'none';
         });
+
+        const qsBtn = document.getElementById('quick-start-btn');
+        function doStart() {
+          if (typeof window.startGame === 'function') {
+            window.startGame(true);
+            if (qsBtn) qsBtn.style.display = 'none';
+            return true;
+          }
+          return false;
+        }
+
+        if (qsBtn) {
+          qsBtn.addEventListener('click', () => {
+            // Dismiss 18+ modal if exists
+            document.querySelector('.dcvh-notice button')?.click();
+            if (!doStart()) {
+              setTimeout(doStart, 600);
+            }
+          });
+        }
+
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+          document.querySelector('.dcvh-notice button')?.click();
+          if (!doStart()) {
+            setTimeout(doStart, 600);
+          }
+        });
+
+        // Hide quick-start button when game is playing
+        setInterval(() => {
+          if (window.__game && window.__game.p && !window.__game.p.demo) {
+            if (qsBtn) qsBtn.style.display = 'none';
+          }
+        }, 1000);
 
         document.getElementById('btn-add-money').addEventListener('click', () => {
           if (window.__game && window.__game.addMoney) {

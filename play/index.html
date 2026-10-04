@@ -68,31 +68,7 @@
     <div id="fps"></div>
     <div id="safe"></div>
 
-    <!-- Thẻ tên người chơi & Đổi tên nhanh (Đặt dưới tai thỏ / status bar - chỉ hiển thị ở màn hình trang chủ / menu bắt đầu) -->
-    <div id="player-name-tag" onclick="window.openRenameModal && window.openRenameModal(event)" style="position:fixed;top:calc(max(env(safe-area-inset-top), 52px) + 12px);left:12px;z-index:99999;background:rgba(26,19,13,0.94);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;border:1.5px solid #e07a5f;backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,0.6);display:flex;align-items:center;gap:6px;user-select:none;touch-action:manipulation;pointer-events:auto;" title="Bấm để đổi tên người chơi">
-      <span style="font-size:15px;pointer-events:none;">👤</span>
-      <span id="player-name-val" style="pointer-events:none;">fake</span>
-      <span style="font-size:12px;color:#f4a261;margin-left:2px;pointer-events:none;">✏️</span>
-    </div>
-
-    <!-- Modal Đổi Tên Người Chơi (Tương thích 100% Mobile iPhone/Android, không bao giờ bị chặn popup) -->
-    <div id="rename-modal" onclick="window.closeRenameModal && window.closeRenameModal(event)" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:999999;display:none;align-items:center;justify-content:center;padding:16px;-webkit-tap-highlight-color:transparent;">
-      <div onclick="event.stopPropagation()" style="background:#2b211b;border:2px solid #e07a5f;border-radius:18px;width:100%;max-width:320px;padding:20px;color:#fff;box-shadow:0 12px 35px rgba(0,0,0,0.85);font-family:system-ui,-apple-system,sans-serif;text-align:center;">
-        <div style="font-size:18px;font-weight:bold;color:#f4a261;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <span>✏️</span> <span>Đổi Tên Người Chơi</span>
-        </div>
-        <div style="font-size:12px;color:#d0c4b4;margin-bottom:14px;line-height:1.4;">
-          Nhập tên mới (đổi bao nhiêu lần cũng được, tự động lưu lịch sử):
-        </div>
-        <input id="modal-rename-input" type="text" maxlength="25" style="width:100%;box-sizing:border-box;background:#1a130d;border:1.5px solid #f4a261;color:#fff;padding:10px 14px;border-radius:10px;font-size:16px;text-align:center;font-weight:bold;outline:none;margin-bottom:16px;" placeholder="Nhập tên của bạn..." />
-        <div style="display:flex;gap:10px;">
-          <button id="modal-rename-cancel" onclick="window.closeRenameModal && window.closeRenameModal(event)" style="flex:1;background:#555;color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;">Hủy</button>
-          <button id="modal-rename-confirm" onclick="window.confirmRename && window.confirmRename(event)" style="flex:1;background:linear-gradient(135deg, #e07a5f, #e76f51);color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;box-shadow:0 3px 10px rgba(224,122,95,0.4);">Lưu Tên</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mod & Quầy Mới Helper Overlay (Chỉ hiển thị cho người chơi HHieu) -->
+    <!-- Mod & Quầy Mới Helper Overlay (Hiển thị khi vào chơi game) -->
     <div id="mod-root" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;display:none;">
       <button id="mod-toggle" style="background:#e07a5f;color:#fff;border:none;padding:9px 16px;border-radius:24px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.5);cursor:pointer;display:flex;align-items:center;gap:6px;">
         <span>🏪 Quán Mới & Tiện Ích Mod</span>
@@ -182,10 +158,6 @@
           <button id="btn-open-stocks" style="background:#238636;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
             📈 Sàn Chứng Khoán (HOA SUA INDEX)
           </button>
-          <button id="btn-rename" style="background:#457b9d;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
-            <span>✏️ Đổi tên người chơi</span>
-            <span id="current-name-badge" style="background:rgba(0,0,0,0.35);padding:2px 8px;border-radius:10px;font-size:11px;color:#ffd166;">Cường</span>
-          </button>
           <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
             💰 +1.000.000đ vốn làm ăn
           </button>
@@ -213,29 +185,6 @@
         });
 
 
-        function getPlayerName() {
-          try {
-            const savedLocal = localStorage.getItem('dcvh_player_name');
-            if (savedLocal && savedLocal.trim()) return savedLocal.trim();
-          } catch(e) {}
-          try {
-            const savedSession = sessionStorage.getItem('dcvh_player_name');
-            if (savedSession && savedSession.trim()) return savedSession.trim();
-          } catch(e) {}
-          if (activePlayerName && activePlayerName.trim()) return activePlayerName.trim();
-          if (window.__game && window.__game.p && window.__game.p.playerName) {
-            return window.__game.p.playerName.trim();
-          }
-          return 'fake';
-        }
-
-        let activePlayerName = getPlayerName();
-
-        function isHHieu(name) {
-          const n = (name || getPlayerName()).trim().toLowerCase();
-          return n === 'hhieu' || n === 'hhiếu';
-        }
-
         function checkIsPlaying() {
           if (window.__inGame === true) return true;
           if (window.__inGame === false) return false;
@@ -245,155 +194,31 @@
         }
 
         function updateModVisibility() {
-          const name = getPlayerName();
-          const allow = isHHieu(name);
           const isPlaying = checkIsPlaying();
-          const isHomeScreen = !isPlaying;
 
-          // 1. Quán mới và tiện ích Mod (chỉ hiện khi đang chơi game và là HHieu)
+          // 1. Quán mới và tiện ích Mod (chỉ hiện khi đang chơi game trên phố)
           const modRoot = document.getElementById('mod-root');
           if (modRoot) {
-            modRoot.style.display = (isPlaying && allow) ? 'block' : 'none';
+            modRoot.style.display = isPlaying ? 'block' : 'none';
           }
           const panel = document.getElementById('mod-panel');
-          if ((!allow || !isPlaying) && panel) {
+          if (!isPlaying && panel) {
             panel.style.display = 'none';
           }
 
-          // 2. Thanh tài chính đỉnh màn hình đã gỡ bỏ hoàn toàn để không chặn nút Sổ sách của game
+          // 2. Dọn sạch thanh tài chính đỉnh màn hình nếu còn tồn tại
           const topFinBar = document.getElementById('top-fin-bar');
           if (topFinBar) {
             topFinBar.remove();
           }
-
-          // 3. Cập nhật thẻ tên (CHỈ XUẤT HIỆN Ở MÀN HÌNH TRANG CHỦ / MENU BẮT ĐẦU, BẮT ĐẦU GAME THÌ ẨN ĐI)
-          const nameVal = document.getElementById('player-name-val');
-          if (nameVal) nameVal.textContent = name;
-          const nameBadge = document.getElementById('current-name-badge');
-          if (nameBadge) nameBadge.textContent = name;
-
-          const tag = document.getElementById('player-name-tag');
-          if (tag) {
-            tag.style.display = isHomeScreen ? 'flex' : 'none';
-            tag.title = 'Tên: ' + name + ' (Bấm để đổi tên)';
-            tag.style.borderColor = allow ? '#2a9d8f' : 'rgba(244,162,97,0.45)';
-          }
-
-          // 4. Đồng bộ tên vào game simulation
-          if (window.__game && window.__game.p) {
-            if (window.__game.p.playerName !== name) {
-              window.__game.p.playerName = name;
-            }
-            if (window.__game.p.hero && window.__game.p.hero.name !== name) {
-              window.__game.p.hero.name = name;
-            }
-          }
         }
 
-        function setPlayerName(newName) {
-          if (!newName || !newName.trim()) return;
-          const clean = newName.trim();
-          activePlayerName = clean;
-          try {
-            localStorage.setItem('dcvh_player_name', clean);
-            sessionStorage.setItem('dcvh_player_name', clean);
-          } catch(e) {}
-          updateModVisibility();
-
-          if (window.__game && window.__game.m && window.__game.m.hud && window.__game.m.hud.toast) {
-            window.__game.m.hud.toast('Đã đổi tên thành: ' + clean);
-          }
-        }
-
-        let modalOpenedAt = 0;
-        function openRenameModal(e) {
-          if (e) {
-            try { e.preventDefault(); e.stopPropagation(); } catch(err) {}
-          }
-          modalOpenedAt = Date.now();
-          const modal = document.getElementById('rename-modal');
-          const input = document.getElementById('modal-rename-input');
-          if (!modal || !input) {
-            const curr = getPlayerName();
-            const val = prompt('✏️ Nhập tên người chơi mới:', curr);
-            if (val !== null && val.trim()) setPlayerName(val.trim());
-            return;
-          }
-          input.value = getPlayerName();
-          modal.style.display = 'flex';
-          setTimeout(() => {
-            try {
-              input.focus();
-              input.select();
-            } catch(e) {}
-          }, 50);
-        }
-
-        function closeRenameModal(e) {
-          if (e && e.target && e.target.id === 'rename-modal') {
-            // Chống click ma (ghost click) trên iOS làm tắt modal ngay khi vừa mở
-            if (Date.now() - modalOpenedAt < 500) return;
-          }
-          const modal = document.getElementById('rename-modal');
-          if (modal) modal.style.display = 'none';
-        }
-
-        function confirmRename(e) {
-          if (e) {
-            try { e.preventDefault(); e.stopPropagation(); } catch(err) {}
-          }
-          const input = document.getElementById('modal-rename-input');
-          if (!input) return;
-          const clean = input.value.trim();
-          if (!clean) {
-            alert('Tên không được để trống!');
-            return;
-          }
-          setPlayerName(clean);
-          closeRenameModal();
-        }
-
-        window.getPlayerName = getPlayerName;
-        window.setPlayerName = setPlayerName;
-        window.doiTen = setPlayerName;
-        window.openRenameModal = openRenameModal;
-        window.closeRenameModal = closeRenameModal;
-        window.confirmRename = confirmRename;
-        window.promptRename = openRenameModal;
-        window.isHHieu = isHHieu;
         window.updateModVisibility = updateModVisibility;
-
-        const tagEl = document.getElementById('player-name-tag');
-        if (tagEl) {
-          tagEl.addEventListener('click', (e) => {
-            openRenameModal(e);
-          });
-        }
-
-        const btnRenameEl = document.getElementById('btn-rename');
-        if (btnRenameEl) {
-          btnRenameEl.addEventListener('click', (e) => {
-            openRenameModal(e);
-          });
-        }
-
-        document.getElementById('modal-rename-confirm')?.addEventListener('click', confirmRename);
-        document.getElementById('modal-rename-cancel')?.addEventListener('click', closeRenameModal);
-        document.getElementById('modal-rename-input')?.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') confirmRename(e);
-          if (e.key === 'Escape') closeRenameModal(e);
-        });
-
-        window.addEventListener('keydown', (e) => {
-          if ((e.key === 'h' || e.key === 'H') && (e.ctrlKey || e.altKey)) {
-            openRenameModal();
-          }
-        });
 
         // Chạy kiểm tra ngay lập tức khi tải trang
         updateModVisibility();
 
-        // Cập nhật mod visibility định kỳ (phản hồi tức thì khi chuyển giữa trang chủ và trong game)
+        // Cập nhật mod visibility định kỳ (tự động hiện mod khi vào game, ẩn khi ra trang chủ)
         setInterval(() => {
           updateModVisibility();
         }, 300);
@@ -415,10 +240,6 @@
         });
 
         function tryBuild(fnName, shopName) {
-          if (typeof isHHieu === 'function' && !isHHieu()) {
-            alert('Quán mới chỉ hiển thị và mở cho người chơi HHieu!');
-            return;
-          }
           if (window.__game && window.__game[fnName]) {
             window.__game[fnName]();
           } else {
@@ -487,10 +308,6 @@
             alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
             return;
           }
-          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
-            alert('Chức năng chỉ dành cho người chơi HHieu!');
-            return;
-          }
 
           const known = sim.knownIds ? Array.from(sim.knownIds()) : [];
           let count = 0;
@@ -509,7 +326,7 @@
           }
 
           if (sim.hero) {
-            const heroName = sim.playerName || 'HHieu';
+            const heroName = (sim.hero && sim.hero.name) || sim.playerName || 'tui';
             sim.hero.say = `Mời tất cả bà con cô bác ly trà đá nước mát ${heroName} bao trọn!`;
             sim.hero.sayTimer = 4.0;
           }
@@ -534,7 +351,7 @@
           }
 
           if (typeof sim.book === 'function') {
-            sim.book('chi', 'social', `Mời nước toàn thể ${count} bà con cô bác phố Hoa Sữa`, 0, 0, void 0, sim.playerName || 'HHieu');
+            sim.book('chi', 'social', `Mời nước toàn thể ${count} bà con cô bác phố Hoa Sữa`, 0, 0, void 0, (sim.hero && sim.hero.name) || sim.playerName || '');
           }
 
           if (window.__game?.m?.hud?.toast) {
@@ -548,10 +365,6 @@
           const sim = window.__game?.p;
           if (!sim) {
             alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
-            return;
-          }
-          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
-            alert('Chức năng chỉ dành cho người chơi HHieu!');
             return;
           }
 
@@ -625,7 +438,7 @@
           }
 
           if (typeof sim.book === 'function') {
-            sim.book('chi', 'social', `Hỏi thăm nhà hàng loạt ${visitedFamilies} hộ gia đình phố Hoa Sữa`, 0, 0, void 0, sim.playerName || 'HHieu');
+            sim.book('chi', 'social', `Hỏi thăm nhà hàng loạt ${visitedFamilies} hộ gia đình phố Hoa Sữa`, 0, 0, void 0, (sim.hero && sim.hero.name) || sim.playerName || '');
           }
 
           if (window.__game?.m?.hud?.toast) {
@@ -639,10 +452,6 @@
           const sim = window.__game?.p;
           if (!sim) {
             alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
-            return;
-          }
-          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
-            alert('Chức năng chỉ dành cho người chơi HHieu!');
             return;
           }
 
@@ -714,7 +523,7 @@
           }
 
           if (sim.hero) {
-            const heroName = sim.playerName || 'HHieu';
+            const heroName = (sim.hero && sim.hero.name) || sim.playerName || 'tui';
             sim.hero.say = `Mời bà con cô bác ai rảnh ghé qua ủng hộ ${heroName} nghen! Bao ngon bao rẻ!`;
             sim.hero.sayTimer = 4.0;
           }

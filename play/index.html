@@ -236,9 +236,7 @@
 
           const tag = document.getElementById('player-name-tag');
           if (tag) {
-            tag.title = allow 
-              ? 'Tên: ' + name + ' (Đang mở Quán Mới & Tiện Ích - Bấm để đổi tên)' 
-              : 'Tên: ' + name + ' (Bấm để đổi tên sang HHieu mở Tiện Ích)';
+            tag.title = 'Tên: ' + name + ' (Bấm để đổi tên)';
             tag.style.borderColor = allow ? '#2a9d8f' : 'rgba(244,162,97,0.45)';
           }
 
@@ -264,15 +262,15 @@
           }
 
           if (isHHieu(clean)) {
-            alert('🎉 Xin chào ' + clean + '!\nĐã kích hoạt hiển thị Quán Mới & Tiện Ích!');
+            alert('🎉 Xin chào ' + clean + '!');
           } else {
-            alert('Đã đổi tên thành "' + clean + '".\nQuán mới và tiện ích đã được ẩn (chỉ hiển thị cho tên "HHieu").\nBạn có thể bấm vào thẻ [👤 ' + clean + '] ở góc trên để đổi lại sang HHieu bất cứ lúc nào!');
+            alert('Đã đổi tên thành: ' + clean);
           }
         }
 
         function promptRename() {
           const current = getPlayerName();
-          const input = prompt('✏️ Nhập tên người chơi mới:\n(Chỉ có tên "HHieu" mới hiển thị Quán Mới & Tiện Ích)', current);
+          const input = prompt('✏️ Nhập tên người chơi mới:', current);
           if (input !== null) {
             const clean = input.trim();
             if (!clean) {

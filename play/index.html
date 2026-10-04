@@ -62,6 +62,7 @@
     <style>@font-face{font-family:Mali;src:url(/play/fonts/Mali-Bold.ttf)format("truetype");font-weight:700;font-display:block}@font-face{font-family:Mali;src:url(/play/fonts/Mali-SemiBold.ttf)format("truetype");font-weight:600;font-display:block}@font-face{font-family:"Baloo 2";src:url(/play/fonts/Baloo2-Bold.ttf)format("truetype");font-weight:700;font-display:block}html,body{overscroll-behavior:none;touch-action:none;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;background:#2b211b;height:100%;margin:0;overflow:hidden}input{touch-action:manipulation;-webkit-user-select:text;user-select:text;font-size:16px}#app{position:fixed;top:0;bottom:0;left:0;right:0}canvas{display:block}#app canvas{touch-action:none}#safe{pointer-events:none;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);position:fixed;top:0;bottom:0;left:0;right:0}#fps{z-index:5;color:#fff8;pointer-events:none;background:#0006;border-radius:8px;padding:4px 8px;font:12px system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;position:fixed;bottom:10px;right:10px}</style>
     <script type="module" crossorigin src="/play/assets/index-DdpGnxCm.js"></script>
     <script src="/play/bank-stock.js?v=20261004_1804"></script>
+    <script src="/play/estate-vehicle-tea.js?v=20261004_2120"></script>
   </head>
   <body>
     <div id="app"></div>
@@ -109,6 +110,9 @@
           <button id="btn-build-tiemtrachanh" style="background:#558b2f;color:#fff;border:1px solid #9ccc65;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
             🍋 Khai trương <b>Trà Chanh Chém Gió</b> (Giã tay, hướng dương)
           </button>
+          <button id="btn-build-tiemtramouoc" style="background:linear-gradient(135deg, #b45309, #d97706);color:#fff;border:1px solid #fde047;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            🧋 Khai trương <b>Tiệm Trà Mơ Ước</b> (Trân Châu Hoàng Kim)
+          </button>
           <button id="btn-build-stall" style="background:#d4a373;color:#2b211b;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
             🥞 Khai trương Tiệm Bánh Xèo Miền Tây
           </button>
@@ -149,6 +153,18 @@
         </div>
 
         <div style="display:flex;flex-direction:column;gap:7px;">
+          <button id="btn-open-estate" style="background:linear-gradient(135deg, #7c2d12, #c2410c);color:#fff;border:1px solid #fb923c;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            🏡 Sàn Bất Động Sản (Mua Nhà & Tiền Thuê)
+          </button>
+          <button id="btn-open-vehicle" style="background:linear-gradient(135deg, #0369a1, #0284c7);color:#fff;border:1px solid #38bdf8;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            🏍️ Showroom Phương Tiện (Mua & Cưỡi Xe)
+          </button>
+          <button id="btn-karin-bless" style="background:linear-gradient(135deg, #d97706, #b45309);color:#fff;border:1px solid #fde047;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            🐾 Thần Mèo Karin Ban Phước (+30s & Lì Xì)
+          </button>
+          <button id="btn-open-teashop" style="background:linear-gradient(135deg, #15803d, #166534);color:#fff;border:1px solid #86efac;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            🧋 Vào Chơi Tiệm Trà Mơ Ước (Trực Tiếp)
+          </button>
           <button id="btn-trigger-robbery" style="background:linear-gradient(135deg, #b71c1c, #d32f2f);color:#fff;border:1px solid #ff7961;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;box-shadow:0 3px 10px rgba(183,28,28,0.5);">
             🚨 Thử Thách: Cướp Quầy Ngân Hàng!
           </button>
@@ -335,8 +351,44 @@
           tryBuild('buildTiemTraChanh', 'Trà Chanh');
         });
 
+        document.getElementById('btn-build-tiemtramouoc')?.addEventListener('click', () => {
+          tryBuild('buildTiemTraMoUoc', 'Tiệm Trà Mơ Ước');
+        });
+
         document.getElementById('btn-build-stall').addEventListener('click', () => {
           tryBuild('buildBanhXeo', 'Tiệm Bánh Xèo');
+        });
+
+        document.getElementById('btn-open-estate')?.addEventListener('click', () => {
+          if (typeof window.openRealEstateModal === 'function') {
+            window.openRealEstateModal();
+          } else {
+            alert('Vui lòng đợi game tải xong!');
+          }
+        });
+
+        document.getElementById('btn-open-vehicle')?.addEventListener('click', () => {
+          if (typeof window.openVehicleShowroomModal === 'function') {
+            window.openVehicleShowroomModal();
+          } else {
+            alert('Vui lòng đợi game tải xong!');
+          }
+        });
+
+        document.getElementById('btn-karin-bless')?.addEventListener('click', () => {
+          if (typeof window.triggerKarinBlessing === 'function') {
+            window.triggerKarinBlessing();
+          } else {
+            alert('Vui lòng đợi game tải xong!');
+          }
+        });
+
+        document.getElementById('btn-open-teashop')?.addEventListener('click', () => {
+          if (typeof window.openTeaShopDirectModal === 'function') {
+            window.openTeaShopDirectModal();
+          } else {
+            alert('Vui lòng đợi game tải xong!');
+          }
         });
 
         document.getElementById('btn-trigger-robbery')?.addEventListener('click', () => {

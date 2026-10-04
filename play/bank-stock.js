@@ -758,95 +758,11 @@
     document.getElementById('stock-modal').style.display = 'flex';
   };
 
-  // Thêm 2 nút bấm nổi bật trên màn hình: CĂN GIỮA ĐỈNH MÀN HÌNH, THU NHỎ TRÊN MOBILE
+  // Đã gỡ bỏ top-fin-bar trên đỉnh màn hình để không chặn nút Sổ sách của game.
+  // Người chơi mở Gửi Tiền và Chứng Khoán qua bảng Tiện Ích Mod ở góc dưới hoặc tại quầy Ngân Hàng.
   function addTopButtons() {
-    if (document.getElementById('top-fin-bar')) return;
-
-    if (!document.getElementById('fin-btn-styles')) {
-      const style = document.createElement('style');
-      style.id = 'fin-btn-styles';
-      style.textContent = `
-        #top-fin-bar {
-          position: fixed;
-          top: calc(max(env(safe-area-inset-top), 52px) + 12px);
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 9990;
-          display: flex;
-          gap: 8px;
-          max-width: 95vw;
-          justify-content: center;
-          align-items: center;
-          pointer-events: auto;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        .top-fin-btn {
-          border-radius: 20px;
-          padding: 6px 14px;
-          font-size: 13px;
-          font-weight: 700;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.45);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          white-space: nowrap;
-          transition: transform 0.15s, opacity 0.15s;
-          user-select: none;
-        }
-        .top-fin-btn:hover {
-          transform: translateY(-1px) scale(1.03);
-        }
-        .top-fin-btn:active {
-          transform: translateY(1px) scale(0.97);
-        }
-        #top-btn-bank {
-          background: linear-gradient(135deg, #1f6feb, #0d47a1);
-          color: #fff;
-          border: 1px solid #388bfd;
-        }
-        #top-btn-stocks {
-          background: linear-gradient(135deg, #238636, #14532d);
-          color: #fff;
-          border: 1px solid #2ea043;
-        }
-        @media (max-width: 640px) {
-          #top-fin-bar {
-            top: calc(max(env(safe-area-inset-top), 52px) + 12px);
-            gap: 4px;
-          }
-          .top-fin-btn {
-            padding: 4px 8px;
-            font-size: 11px;
-            border-radius: 12px;
-            gap: 4px;
-          }
-          .top-fin-btn .fin-sub {
-            display: none !important;
-          }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    const bar = document.createElement('div');
-    bar.id = 'top-fin-bar';
-    if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
-      bar.style.display = 'none';
-    }
-    bar.innerHTML = `
-      <button id="top-btn-bank" class="top-fin-btn" title="Gửi tiền ngân hàng nhận lãi mỗi ngày">
-        <span>🏦</span> <span>Gửi Tiền <span class="fin-sub">(Lãi 3-18%)</span></span>
-      </button>
-      <button id="top-btn-stocks" class="top-fin-btn" title="Sàn chứng khoán Hoa Sữa Index">
-        <span>📈</span> <span>Chứng Khoán <span class="fin-sub">Index</span></span>
-      </button>
-    `;
-
-    document.body.appendChild(bar);
-
-    bar.querySelector('#top-btn-bank').onclick = () => window.__openBank();
-    bar.querySelector('#top-btn-stocks').onclick = () => window.__openStocks();
+    const existing = document.getElementById('top-fin-bar');
+    if (existing) existing.remove();
   }
 
   if (document.readyState === 'loading') {

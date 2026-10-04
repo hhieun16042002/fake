@@ -65,8 +65,15 @@
     <div id="fps"></div>
     <div id="safe"></div>
 
-    <!-- Mod & Quầy Mới Helper Overlay -->
-    <div id="mod-root" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;">
+    <!-- Thẻ tên người chơi & Đổi tên nhanh -->
+    <div id="player-name-tag" style="position:fixed;top:8px;left:10px;z-index:9997;background:rgba(30,20,15,0.85);color:#fff;padding:6px 12px;border-radius:14px;font-size:12px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;border:1px solid rgba(244,162,97,0.45);backdrop-filter:blur(6px);box-shadow:0 3px 10px rgba(0,0,0,0.4);display:flex;align-items:center;gap:6px;user-select:none;" title="Bấm để đổi tên người chơi">
+      <span>👤</span>
+      <span id="player-name-val">HHieu</span>
+      <span style="font-size:11px;color:#f4a261;">✏️</span>
+    </div>
+
+    <!-- Mod & Quầy Mới Helper Overlay (Chỉ hiển thị cho người chơi HHieu) -->
+    <div id="mod-root" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;display:none;">
       <button id="mod-toggle" style="background:#e07a5f;color:#fff;border:none;padding:9px 16px;border-radius:24px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.5);cursor:pointer;display:flex;align-items:center;gap:6px;">
         <span>🏪 Quán Mới & Tiện Ích Mod</span>
       </button>
@@ -125,8 +132,9 @@
           <button id="btn-open-stocks" style="background:#238636;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
             📈 Sàn Chứng Khoán (HOA SUA INDEX)
           </button>
-          <button id="btn-start-game" style="background:#38b000;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
-            ▶ Bắt đầu vào chơi ngay
+          <button id="btn-rename" style="background:#457b9d;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
+            <span>✏️ Đổi tên người chơi</span>
+            <span id="current-name-badge" style="background:rgba(0,0,0,0.35);padding:2px 8px;border-radius:10px;font-size:11px;color:#ffd166;">HHieu</span>
           </button>
           <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
             💰 +1.000.000đ vốn làm ăn
@@ -177,18 +185,120 @@
           });
         }
 
-        document.getElementById('btn-start-game').addEventListener('click', () => {
-          document.querySelector('.dcvh-notice button')?.click();
-          if (!doStart()) {
-            setTimeout(doStart, 600);
+        // Quản lý tên người chơi & Quyền hiển thị Quán Mới & Tiện Ích (chỉ mở cho HHieu)
+        function getPlayerName() {
+          const saved = localStorage.getItem('dcvh_player_name');
+          if (saved && saved.trim()) return saved.trim();
+          if (window.__game && window.__game.p && window.__game.p.playerName) {
+            return window.__game.p.playerName.trim();
+          }
+          return 'HHieu';
+        }
+
+        function isHHieu(name) {
+          const n = (name || getPlayerName()).trim().toLowerCase();
+          return n === 'hhieu' || n === 'hhiếu';
+        }
+
+        function updateModVisibility() {
+          const name = getPlayerName();
+          const allow = isHHieu(name);
+
+          // 1. Quán mới và tiện ích Mod
+          const modRoot = document.getElementById('mod-root');
+          if (modRoot) {
+            modRoot.style.display = allow ? 'block' : 'none';
+          }
+          const panel = document.getElementById('mod-panel');
+          if (!allow && panel) {
+            panel.style.display = 'none';
+          }
+
+          // 2. Thanh tài chính đỉnh màn hình
+          const topFinBar = document.getElementById('top-fin-bar');
+          if (topFinBar) {
+            topFinBar.style.display = allow ? 'flex' : 'none';
+          }
+
+          // 3. Cập nhật thẻ tên
+          const nameVal = document.getElementById('player-name-val');
+          if (nameVal) nameVal.textContent = name;
+          const nameBadge = document.getElementById('current-name-badge');
+          if (nameBadge) nameBadge.textContent = name;
+
+          const tag = document.getElementById('player-name-tag');
+          if (tag) {
+            tag.title = allow 
+              ? 'Tên: ' + name + ' (Đang mở Quán Mới & Tiện Ích - Bấm để đổi tên)' 
+              : 'Tên: ' + name + ' (Bấm để đổi tên sang HHieu mở Tiện Ích)';
+            tag.style.borderColor = allow ? '#2a9d8f' : 'rgba(244,162,97,0.45)';
+          }
+
+          // 4. Đồng bộ tên vào game simulation
+          if (window.__game && window.__game.p) {
+            if (window.__game.p.playerName !== name) {
+              window.__game.p.playerName = name;
+            }
+            if (window.__game.p.hero && window.__game.p.hero.name !== name) {
+              window.__game.p.hero.name = name;
+            }
+          }
+        }
+
+        function setPlayerName(newName) {
+          if (!newName || !newName.trim()) return;
+          const clean = newName.trim();
+          localStorage.setItem('dcvh_player_name', clean);
+          updateModVisibility();
+
+          if (window.__game && window.__game.m && window.__game.m.hud && window.__game.m.hud.toast) {
+            window.__game.m.hud.toast('Đã đổi tên thành: ' + clean);
+          }
+
+          if (isHHieu(clean)) {
+            alert('🎉 Xin chào ' + clean + '!\nĐã kích hoạt hiển thị Quán Mới & Tiện Ích!');
+          } else {
+            alert('Đã đổi tên thành "' + clean + '".\nQuán mới và tiện ích đã được ẩn (chỉ hiển thị cho tên "HHieu").\nBạn có thể bấm vào thẻ [👤 ' + clean + '] ở góc trên để đổi lại sang HHieu bất cứ lúc nào!');
+          }
+        }
+
+        function promptRename() {
+          const current = getPlayerName();
+          const input = prompt('✏️ Nhập tên người chơi mới:\n(Chỉ có tên "HHieu" mới hiển thị Quán Mới & Tiện Ích)', current);
+          if (input !== null) {
+            const clean = input.trim();
+            if (!clean) {
+              alert('Tên không được để trống!');
+              return;
+            }
+            setPlayerName(clean);
+          }
+        }
+
+        window.setPlayerName = setPlayerName;
+        window.doiTen = setPlayerName;
+        window.promptRename = promptRename;
+        window.isHHieu = isHHieu;
+        window.updateModVisibility = updateModVisibility;
+
+        document.getElementById('player-name-tag')?.addEventListener('click', promptRename);
+        document.getElementById('btn-rename')?.addEventListener('click', promptRename);
+
+        window.addEventListener('keydown', (e) => {
+          if ((e.key === 'h' || e.key === 'H') && (e.ctrlKey || e.altKey)) {
+            promptRename();
           }
         });
 
-        // Hide quick-start button when game is playing
+        // Chạy kiểm tra ngay lập tức khi tải trang
+        updateModVisibility();
+
+        // Hide quick-start button when game is playing & cập nhật mod visibility
         setInterval(() => {
           if (window.__game && window.__game.p && !window.__game.p.demo) {
             if (qsBtn) qsBtn.style.display = 'none';
           }
+          updateModVisibility();
         }, 1000);
 
         document.getElementById('btn-add-money').addEventListener('click', () => {
@@ -208,6 +318,10 @@
         });
 
         function tryBuild(fnName, shopName) {
+          if (typeof isHHieu === 'function' && !isHHieu()) {
+            alert('Quán mới chỉ hiển thị và mở cho người chơi HHieu!');
+            return;
+          }
           if (window.__game && window.__game[fnName]) {
             window.__game[fnName]();
           } else {

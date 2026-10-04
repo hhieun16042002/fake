@@ -119,6 +119,36 @@
         </div>
 
         <div style="border-top:1px solid #443224;padding-top:10px;margin-bottom:8px;">
+          <b style="color:#f4a261;font-size:13px;">🤝 Giao Tiếp & Kéo Khách Hàng Loạt</b>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
+          <button id="btn-treat-all" style="background:linear-gradient(135deg, #028090, #00a896);color:#fff;border:1px solid #02c39a;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            <span style="font-size:18px;">🍵</span>
+            <div>
+              <div>Mời Nước Tất Cả Bà Con</div>
+              <div style="font-size:11px;color:#cbf3f0;font-weight:normal;">Tăng tình cảm xóm giềng, giải nguội quan hệ</div>
+            </div>
+          </button>
+
+          <button id="btn-visit-all" style="background:linear-gradient(135deg, #d90429, #ef233c);color:#fff;border:1px solid #ff4d6d;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            <span style="font-size:18px;">🏡</span>
+            <div>
+              <div>Hỏi Thăm Nhà Hàng Loạt Tất Cả</div>
+              <div style="font-size:11px;color:#ffccd5;font-weight:normal;">Thăm tất cả hộ dân, chủ nhà vui vẻ ủng hộ</div>
+            </div>
+          </button>
+
+          <button id="btn-call-all" style="background:linear-gradient(135deg, #f77f00, #fcbf49);color:#2b211b;border:1px solid #eae2b7;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 8px rgba(0,0,0,0.3);">
+            <span style="font-size:18px;">📣</span>
+            <div>
+              <div style="color:#000;">Mời Ghé Tất Cả Quán</div>
+              <div style="font-size:11px;color:#492807;font-weight:normal;">Vẫy toàn bộ người đi đường ghé vào tất cả các quầy</div>
+            </div>
+          </button>
+        </div>
+
+        <div style="border-top:1px solid #443224;padding-top:10px;margin-bottom:8px;">
           <b style="color:#f4a261;font-size:13px;">⚙️ Tiện Ích & Sự Kiện</b>
         </div>
 
@@ -380,6 +410,235 @@
         document.getElementById('btn-open-stocks')?.addEventListener('click', () => {
           if (typeof window.__openStocks === 'function') window.__openStocks();
         });
+
+        // =========================================================================
+        // HỆ THỐNG GIAO TIẾP & KÉO KHÁCH HÀNG LOẠT
+        // =========================================================================
+        window.moiNuocTatCa = function() {
+          const sim = window.__game?.p;
+          if (!sim) {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+            return;
+          }
+          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
+            alert('Chức năng chỉ dành cho người chơi HHieu!');
+            return;
+          }
+
+          const known = sim.knownIds ? Array.from(sim.knownIds()) : [];
+          let count = 0;
+
+          for (let id of known) {
+            if (sim.soc && typeof sim.soc.gain === 'function') {
+              const newTier = sim.soc.gain(id, 'favor', 25, sim.day);
+              if (newTier >= 2 && typeof sim.emit === 'function') {
+                try { sim.emit('game', 'relTier', id, { tier: newTier }); } catch(e) {}
+              }
+            }
+            if (sim.contactDone) {
+              sim.contactDone['treat:' + id] = sim.day;
+            }
+            count++;
+          }
+
+          if (sim.hero) {
+            const heroName = sim.playerName || 'HHieu';
+            sim.hero.say = `Mời tất cả bà con cô bác ly trà đá nước mát ${heroName} bao trọn!`;
+            sim.hero.sayTimer = 4.0;
+          }
+
+          let happyCount = 0;
+          if (Array.isArray(sim.people)) {
+            const thankLines = [
+              'Cảm ơn chủ quán nghen, mát dạ quá!',
+              'Quán chu đáo quá trời!',
+              'Uống ly nước mát thấy khỏe re!',
+              'Chủ quầy hào sảng số một phố Hoa Sữa!',
+              'Ngon ngọt mát lành, cảm ơn nghen!'
+            ];
+            for (let p of sim.people) {
+              if (!p.species && p.state !== 'gone') {
+                p.say = thankLines[Math.floor(Math.random() * thankLines.length)];
+                p.sayTimer = 3.5;
+                p.react = { kind: 'happy', t: 3.5, t0: 3.5 };
+                happyCount++;
+              }
+            }
+          }
+
+          if (typeof sim.book === 'function') {
+            sim.book('chi', 'social', `Mời nước toàn thể ${count} bà con cô bác phố Hoa Sữa`, 0, 0, void 0, sim.playerName || 'HHieu');
+          }
+
+          if (window.__game?.m?.hud?.toast) {
+            window.__game.m.hud.toast(`🍵 Đã mời nước ${count} người quen & ${happyCount} bà con trên phố! Tình cảm xóm giềng tăng vọt!`);
+          } else {
+            alert(`🍵 Đã mời nước toàn bộ ${count} người quen & bà con! Tình làng nghĩa xóm gắn kết, không ai còn bị nguội!`);
+          }
+        };
+
+        window.hoiThamNhaTatCa = function() {
+          const sim = window.__game?.p;
+          if (!sim) {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+            return;
+          }
+          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
+            alert('Chức năng chỉ dành cho người chơi HHieu!');
+            return;
+          }
+
+          const known = sim.knownIds ? sim.knownIds() : new Set();
+          let visitedFamilies = 0;
+          let newMembers = 0;
+
+          const allIds = Array.from(known);
+          for (let id of allIds) {
+            if (sim.soc && typeof sim.soc.gain === 'function') {
+              sim.soc.gain(id, 'talk', 20, sim.day);
+              sim.soc.gain(id, 'favor', 30, sim.day);
+            }
+            if (sim.contactDone) {
+              sim.contactDone['family:' + id] = sim.day;
+            }
+
+            if (typeof sim.familyOf === 'function') {
+              try {
+                const fam = sim.familyOf(id);
+                if (fam && fam.length) {
+                  for (let m of fam) {
+                    if (!known.has(m.id)) {
+                      if (sim.soc) {
+                        sim.soc.introduce(id, m.id, sim.day);
+                        sim.soc.gain(id, 'talk', 10, sim.day);
+                        sim.soc.discover(id, m.id, (sim.kin && sim.kin.pair(id, m.id)) || 'cùng nhà');
+                      }
+                      known.add(m.id);
+                      newMembers++;
+                    }
+                  }
+                }
+              } catch(e) {}
+            }
+            visitedFamilies++;
+          }
+
+          if (Array.isArray(sim.slots)) {
+            for (let slot of sim.slots) {
+              if (slot && slot.lease) {
+                slot.lease.last = sim.day;
+                if (slot.lease.cause === 'cold') {
+                  slot.lease.cause = null;
+                  slot.lease.due = false;
+                }
+              }
+            }
+          }
+
+          if (sim.hero) {
+            sim.hero.say = 'Chúc toàn thể cô chú anh chị em trong xóm luôn dồi dào sức khỏe, an khang!';
+            sim.hero.sayTimer = 4.5;
+          }
+
+          if (Array.isArray(sim.people)) {
+            const replyLines = [
+              'Gia đình gửi lời cảm ơn quán nghen!',
+              'Có lòng ghé thăm là quý lắm con ơi!',
+              'Chúc cháu buôn may bán đắt!',
+              'Gặp được người thật thà như vầy mừng ghê!',
+              'Bà con ai cũng mến quán!'
+            ];
+            for (let p of sim.people) {
+              if (!p.species && p.state !== 'gone' && Math.random() < 0.8) {
+                p.say = replyLines[Math.floor(Math.random() * replyLines.length)];
+                p.sayTimer = 3.5;
+                p.react = { kind: 'happy', t: 3.5, t0: 3.5 };
+              }
+            }
+          }
+
+          if (typeof sim.book === 'function') {
+            sim.book('chi', 'social', `Hỏi thăm nhà hàng loạt ${visitedFamilies} hộ gia đình phố Hoa Sữa`, 0, 0, void 0, sim.playerName || 'HHieu');
+          }
+
+          if (window.__game?.m?.hud?.toast) {
+            window.__game.m.hud.toast(`🏡 Đã thăm ${visitedFamilies} hộ dân, kết thân thêm ${newMembers} người nhà! Tình làng nghĩa xóm trọn vẹn!`);
+          } else {
+            alert(`🏡 Đã hỏi thăm nhà hàng loạt ${visitedFamilies} hộ gia đình, kết thân thêm ${newMembers} người thân! Tình làng nghĩa xóm bền chặt!`);
+          }
+        };
+
+        window.moiGheTatCa = function() {
+          const sim = window.__game?.p;
+          if (!sim) {
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+            return;
+          }
+          if (typeof window.isHHieu === 'function' && !window.isHHieu()) {
+            alert('Chức năng chỉ dành cho người chơi HHieu!');
+            return;
+          }
+
+          const activeSlots = (sim.slots || []).filter(s => s && s.stallId && !s.setup && (s.stock == null || s.stock > 0));
+          const walkers = (sim.people || []).filter(p => !p.species && p.state === 'walking' && !p.vehicleId && !p.mounted);
+
+          let attractedCount = 0;
+          const shoutLines = [
+            'Ghé quán ủng hộ liền nha!',
+            'Đông vui quá, tấp vô làm ly/dĩa!',
+            'Mùi thơm nức mũi, mua ngay!',
+            'Ủng hộ chủ quán nhiệt tình!',
+            'Hôm nay đông ghê, ghé mua mở hàng!'
+          ];
+
+          for (let i = 0; i < walkers.length; i++) {
+            const w = walkers[i];
+            if (activeSlots.length > 0) {
+              const slot = activeSlots[i % activeSlots.length];
+              w.kind = 'stall';
+              w.slotIndex = slot.index;
+              w.state = 'toStall';
+              w.patience = w.patienceMax = 90;
+              w.say = shoutLines[Math.floor(Math.random() * shoutLines.length)];
+              w.sayTimer = 3.0;
+              attractedCount++;
+            } else {
+              w.kind = 'goods';
+              w.state = 'waving';
+              w.patience = w.patienceMax = 90;
+              w.say = 'Bán cho tui với!';
+              w.sayTimer = 3.0;
+              attractedCount++;
+            }
+          }
+
+          if (typeof sim.knownIds === 'function') {
+            try {
+              const ids = Array.from(sim.knownIds()).slice(0, 10);
+              for (let rid of ids) {
+                if (typeof sim.stageCustomer === 'function') {
+                  sim.stageCustomer(rid);
+                }
+              }
+            } catch(e) {}
+          }
+
+          if (sim.hero) {
+            const heroName = sim.playerName || 'HHieu';
+            sim.hero.say = `Mời tất cả bà con cô bác ghé qua quầy ${heroName} ủng hộ em nhé! Hàng mới nóng hổi ngon rẻ số một!`;
+            sim.hero.sayTimer = 4.5;
+          }
+
+          if (window.__game?.m?.hud?.toast) {
+            window.__game.m.hud.toast(`📣 Đã mời thành công ${attractedCount} khách đi đường tấp vào tất cả quầy hàng!`);
+          } else {
+            alert(`📣 Đã mời ${attractedCount} người đi đường ghé vào quầy! Khách đang đổ về ùn ùn!`);
+          }
+        };
+
+        document.getElementById('btn-treat-all')?.addEventListener('click', () => window.moiNuocTatCa());
+        document.getElementById('btn-visit-all')?.addEventListener('click', () => window.hoiThamNhaTatCa());
+        document.getElementById('btn-call-all')?.addEventListener('click', () => window.moiGheTatCa());
 
         let speedFast = false;
         document.getElementById('btn-speed').addEventListener('click', (e) => {

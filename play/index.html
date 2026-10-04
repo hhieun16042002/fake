@@ -58,7 +58,7 @@
     <link rel="apple-touch-icon" href="/play/icons/apple-touch-icon.png" />
     <style>@font-face{font-family:Mali;src:url(/play/fonts/Mali-Bold.ttf)format("truetype");font-weight:700;font-display:block}@font-face{font-family:Mali;src:url(/play/fonts/Mali-SemiBold.ttf)format("truetype");font-weight:600;font-display:block}@font-face{font-family:"Baloo 2";src:url(/play/fonts/Baloo2-Bold.ttf)format("truetype");font-weight:700;font-display:block}html,body{overscroll-behavior:none;touch-action:none;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;background:#2b211b;height:100%;margin:0;overflow:hidden}input{touch-action:manipulation;-webkit-user-select:text;user-select:text;font-size:16px}#app{position:fixed;top:0;bottom:0;left:0;right:0}canvas{display:block}#app canvas{touch-action:none}#safe{pointer-events:none;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);position:fixed;top:0;bottom:0;left:0;right:0}#fps{z-index:5;color:#fff8;pointer-events:none;background:#0006;border-radius:8px;padding:4px 8px;font:12px system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;position:fixed;bottom:10px;right:10px}</style>
     <script type="module" crossorigin src="/play/assets/index-DdpGnxCm.js"></script>
-    <script src="/play/bank-stock.js"></script>
+    <script src="/play/bank-stock.js?v=20261004_1730"></script>
   </head>
   <body>
     <div id="app"></div>
@@ -179,10 +179,6 @@
       </div>
     </div>
 
-    <!-- Nút Bắt Đầu To Nổi Bật Dành Cho Điện Thoại & Trình Duyệt -->
-    <button id="quick-start-btn" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9998;background:#2d8a4e;color:#fff;border:3px solid #fff;border-radius:30px;padding:12px 28px;font-size:17px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,0.5);cursor:pointer;display:flex;align-items:center;gap:8px;">
-      <span>🎮 BẮT ĐẦU CHƠI NGAY</span>
-    </button>
 
     <script>
       (function() {
@@ -196,24 +192,6 @@
           panel.style.display = 'none';
         });
 
-        const qsBtn = document.getElementById('quick-start-btn');
-        function doStart() {
-          if (typeof window.startGame === 'function') {
-            window.startGame(true);
-            if (qsBtn) qsBtn.style.display = 'none';
-            return true;
-          }
-          return false;
-        }
-
-        if (qsBtn) {
-          qsBtn.addEventListener('click', () => {
-            document.querySelector('.dcvh-notice button')?.click();
-            if (!doStart()) {
-              setTimeout(doStart, 600);
-            }
-          });
-        }
 
         // Quản lý tên người chơi & Quyền hiển thị Quán Mới & Tiện Ích (chỉ mở cho HHieu)
         function getPlayerName() {
@@ -323,11 +301,8 @@
         // Chạy kiểm tra ngay lập tức khi tải trang
         updateModVisibility();
 
-        // Hide quick-start button when game is playing & cập nhật mod visibility
+        // Cập nhật mod visibility định kỳ
         setInterval(() => {
-          if (window.__game && window.__game.p && !window.__game.p.demo) {
-            if (qsBtn) qsBtn.style.display = 'none';
-          }
           updateModVisibility();
         }, 1000);
 

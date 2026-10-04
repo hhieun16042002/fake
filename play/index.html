@@ -564,59 +564,82 @@
           }
 
           const activeSlots = (sim.slots || []).filter(s => s && s.stallId && !s.setup && (s.stock == null || s.stock > 0));
-          const walkers = (sim.people || []).filter(p => !p.species && p.state === 'walking' && !p.vehicleId && !p.mounted);
+          const allPeople = Array.isArray(sim.people) ? sim.people : [];
 
-          let attractedCount = 0;
-          const shoutLines = [
-            'Ghé quán ủng hộ liền nha!',
-            'Đông vui quá, tấp vô làm ly/dĩa!',
-            'Mùi thơm nức mũi, mua ngay!',
-            'Ủng hộ chủ quán nhiệt tình!',
-            'Hôm nay đông ghê, ghé mua mở hàng!'
-          ];
-
-          for (let i = 0; i < walkers.length; i++) {
-            const w = walkers[i];
-            if (activeSlots.length > 0) {
-              const slot = activeSlots[i % activeSlots.length];
-              w.kind = 'stall';
-              w.slotIndex = slot.index;
-              w.state = 'toStall';
-              w.patience = w.patienceMax = 90;
-              w.say = shoutLines[Math.floor(Math.random() * shoutLines.length)];
-              w.sayTimer = 3.0;
-              attractedCount++;
-            } else {
-              w.kind = 'goods';
-              w.state = 'waving';
-              w.patience = w.patienceMax = 90;
-              w.say = 'Bán cho tui với!';
-              w.sayTimer = 3.0;
-              attractedCount++;
-            }
+          // Bộ lọc chuẩn: ai mời được thì mời, ai bận/chặn/làm nhiệm vụ thì giữ nguyên
+          function canInvite(p) {
+            if (!p || p.species) return false;
+            if (p.mounted || p.vehicleId || p.riding) return false;
+            if (p.uniform || p.kind === 'police' || p.kind === 'gang') return false;
+            if (p.cast || p.duty || p.errand || p.vendor) return false;
+            if (p.react) return false;
+            if (p.seated || p.state === 'dining' || p.state === 'eating') return false;
+            if (p.state === 'toStall' || p.state === 'ordered' || p.state === 'served' || p.state === 'buying') return false;
+            if (p.state === 'crossWait' || p.state === 'leaving' || p.state === 'gone') return false;
+            if (p.hurry && p.hurry >= 0.55) return false;
+            if (p.fade != null && p.fade < 0.85) return false;
+            if (typeof sim.bystander === 'function' && !sim.bystander(p)) return false;
+            return p.state === 'walking' || p.state === 'idle';
           }
 
-          if (typeof sim.knownIds === 'function') {
-            try {
-              const ids = Array.from(sim.knownIds()).slice(0, 10);
-              for (let rid of ids) {
-                if (typeof sim.stageCustomer === 'function') {
-                  sim.stageCustomer(rid);
-                }
+          let invitedCount = 0;
+
+          const acceptLines = [
+            'Dạ ghé quán ủng hộ liền nha!',
+            'Đông vui quá, tấp vô làm ly/dĩa!',
+            'Mùi thơm nức mũi, ghé mua ngay!',
+            'Chủ quán mời nhiệt tình quá, ghé liền!',
+            'Ủng hộ quán nha, làm phần nóng hổi!'
+          ];
+
+          const busyLines = [
+            'Đang vội quá, bữa khác ghé nha!',
+            'Bận việc gấp rồi con ơi!',
+            'Đang đi công việc, hẹn bữa khác!',
+            'Để chiều mát tui ghé ủng hộ nghen!'
+          ];
+
+          for (let p of allPeople) {
+            if (p.species || p.state === 'gone') continue;
+
+            if (canInvite(p)) {
+              // Ai mời được thì mời vào quầy
+              if (activeSlots.length > 0) {
+                const slot = activeSlots[invitedCount % activeSlots.length];
+                p.kind = 'stall';
+                p.slotIndex = slot.index;
+                p.state = 'toStall';
+                p.patience = p.patienceMax = 65;
+                p.say = acceptLines[Math.floor(Math.random() * acceptLines.length)];
+                p.sayTimer = 3.0;
+                invitedCount++;
+              } else {
+                p.kind = 'goods';
+                p.state = 'waving';
+                p.patience = p.patienceMax = 65;
+                p.say = 'Bán cho tui với!';
+                p.sayTimer = 3.0;
+                invitedCount++;
               }
-            } catch(e) {}
+            } else {
+              // Ai dính chặn, bận, làm nhiệm vụ, chạy xe... thì giữ nguyên như cũ!
+              if ((p.state === 'walking' || p.hurry) && !p.say && !p.mounted && Math.random() < 0.3) {
+                p.say = busyLines[Math.floor(Math.random() * busyLines.length)];
+                p.sayTimer = 2.4;
+              }
+            }
           }
 
           if (sim.hero) {
             const heroName = sim.playerName || 'HHieu';
-            sim.hero.say = `Mời tất cả bà con cô bác ghé qua quầy ${heroName} ủng hộ em nhé! Hàng mới nóng hổi ngon rẻ số một!`;
-            sim.hero.sayTimer = 4.5;
+            sim.hero.say = `Mời bà con cô bác ai rảnh ghé qua ủng hộ ${heroName} nghen! Bao ngon bao rẻ!`;
+            sim.hero.sayTimer = 4.0;
           }
 
           if (window.__game?.m?.hud?.toast) {
-            window.__game.m.hud.toast(`📣 Đã mời thành công ${attractedCount} khách đi đường tấp vào tất cả quầy hàng!`);
+            window.__game.m.hud.toast(`📣 Đã mời ${invitedCount} khách rảnh rỗi vào quầy! (Ai bận/chặn vẫn giữ nguyên)`);
           } else {
-            alert(`📣 Đã mời ${attractedCount} người đi đường ghé vào quầy! Khách đang đổ về ùn ùn!`);
+            alert(`📣 Đã mời ${invitedCount} khách rảnh rỗi vào quầy! Những người đang bận việc hoặc bị chặn vẫn tiếp tục công việc.`);
           }
         };
 

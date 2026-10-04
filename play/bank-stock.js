@@ -768,7 +768,7 @@
       style.textContent = `
         #top-fin-bar {
           position: fixed;
-          top: 8px;
+          top: calc(max(env(safe-area-inset-top), 52px) + 12px);
           left: 50%;
           transform: translateX(-50%);
           z-index: 9990;
@@ -812,7 +812,7 @@
         }
         @media (max-width: 640px) {
           #top-fin-bar {
-            top: 4px;
+            top: calc(max(env(safe-area-inset-top), 52px) + 12px);
             gap: 4px;
           }
           .top-fin-btn {

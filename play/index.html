@@ -66,40 +66,58 @@
 
     <!-- Mod & Quầy Mới Helper Overlay -->
     <div id="mod-root" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-family:system-ui,-apple-system,sans-serif;">
-      <button id="mod-toggle" style="background:#e07a5f;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;">
-        <span>🥞 Tiệm Bánh Xèo & Tiện ích</span>
+      <button id="mod-toggle" style="background:#e07a5f;color:#fff;border:none;padding:9px 16px;border-radius:24px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.5);cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <span>🏪 Quán Mới & Tiện Ích Mod</span>
       </button>
 
-      <div id="mod-panel" style="display:none;margin-top:8px;background:rgba(33,25,15,0.95);border:1px solid #e07a5f88;backdrop-filter:blur(10px);color:#fff;padding:14px;border-radius:14px;width:310px;box-shadow:0 8px 24px rgba(0,0,0,0.6);font-size:13px;line-height:1.5;">
+      <div id="mod-panel" style="display:none;margin-top:8px;background:rgba(26,19,13,0.96);border:1px solid #e07a5fa0;backdrop-filter:blur(12px);color:#fff;padding:14px;border-radius:16px;width:320px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,0.7);font-size:13px;line-height:1.5;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #443224;padding-bottom:6px;">
-          <b style="color:#f4a261;font-size:14px;">🏪 Quầy Mới: Bánh Xèo Miền Tây</b>
-          <button id="mod-close" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:16px;">✕</button>
+          <b style="color:#f4a261;font-size:14px;">🏪 Quán Mới Khai Trương</b>
+          <button id="mod-close" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:18px;padding:0 4px;">✕</button>
         </div>
-        <div style="font-size:12px;color:#d0c4b4;margin-bottom:12px;">
-          Đã thêm vào danh mục mở quầy:<br/>
-          • 🥞 <b>Bánh xèo tôm thịt</b> (35k, đĩa rau rừng)<br/>
-          • 🥥 <b>Bánh khọt nước cốt dừa</b> (30k, mỡ hành)<br/>
-          • ⭐ <b>Bánh xèo củ hũ dừa đặc biệt</b> (55k, tier 3)
+
+        <div style="font-size:12px;color:#d0c4b4;margin-bottom:10px;">
+          Bấm để khai trương quầy vào ô vỉa hè trống:
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button id="btn-start-game" style="background:#38b000;color:#fff;border:none;padding:10px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:14px;">
+
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
+          <button id="btn-build-quannet" style="background:#1d3557;color:#fff;border:1px solid #457b9d;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
+            🖥️ Khai trương <b>Quán Nét Cỏ</b> (Mì 2 trứng, Sting)
+          </button>
+          <button id="btn-build-banquat" style="background:#e76f51;color:#fff;border:1px solid #f4a261;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
+            🌀 Khai trương <b>Tiệm Quạt OnlyFans</b> (Bao mát rượi)
+          </button>
+          <button id="btn-build-banloa" style="background:#9d0208;color:#fff;border:1px solid #dc2f02;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
+            🔊 Khai trương <b>Tiệm Loa Cho Vợ</b> (Bass tức ngực)
+          </button>
+          <button id="btn-build-banhoa" style="background:#e07a5f;color:#fff;border:1px solid #f2cc8f;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
+            💐 Khai trương <b>Tiệm Hoa Tươi</b> (Hồng tỏ tình)
+          </button>
+          <button id="btn-build-banxe" style="background:#3d5a80;color:#fff;border:1px solid #98c1d9;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
+            🚗 Khai trương <b>Salon Ô Tô - Xe Máy</b> (Wave, SH)
+          </button>
+          <button id="btn-build-stall" style="background:#d4a373;color:#2b211b;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
+            🥞 Khai trương Tiệm Bánh Xèo Miền Tây
+          </button>
+        </div>
+
+        <div style="border-top:1px solid #443224;padding-top:10px;margin-bottom:8px;">
+          <b style="color:#f4a261;font-size:13px;">⚙️ Tiện Ích Hỗ Trợ</b>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <button id="btn-start-game" style="background:#38b000;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:13px;">
             ▶ Bắt đầu vào chơi ngay
           </button>
-          <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+          <button id="btn-add-money" style="background:#2a9d8f;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
             💰 +1.000.000đ vốn làm ăn
           </button>
-          <button id="btn-unlock-street" style="background:#e76f51;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
-            🔓 Mở khóa vỉa hè mở quán ngay
+          <button id="btn-unlock-street" style="background:#e76f51;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
+            🔓 Mở khóa phố & vỉa hè ngay
           </button>
-          <button id="btn-build-stall" style="background:#e07a5f;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
-            🥞 Khai trương ngay Tiệm Bánh Xèo
-          </button>
-          <button id="btn-speed" style="background:#457b9d;color:#fff;border:none;padding:9px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;">
+          <button id="btn-speed" style="background:#457b9d;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:bold;cursor:pointer;text-align:left;font-size:12px;">
             ⚡ Tăng tốc độ game x3
           </button>
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:#887766;text-align:center;">
-          Bấm "Bắt đầu" vào game rồi sử dụng các nút trên!
         </div>
       </div>
     </div>
@@ -133,7 +151,6 @@
 
         if (qsBtn) {
           qsBtn.addEventListener('click', () => {
-            // Dismiss 18+ modal if exists
             document.querySelector('.dcvh-notice button')?.click();
             if (!doStart()) {
               setTimeout(doStart, 600);
@@ -171,12 +188,36 @@
           }
         });
 
-        document.getElementById('btn-build-stall').addEventListener('click', () => {
-          if (window.__game && window.__game.buildBanhXeo) {
-            window.__game.buildBanhXeo();
+        function tryBuild(fnName, shopName) {
+          if (window.__game && window.__game[fnName]) {
+            window.__game[fnName]();
           } else {
-            alert('Vui lòng đợi game tải xong và bấm Bắt đầu!');
+            alert('Vui lòng đợi game tải xong và bấm Bắt đầu trước khi mở ' + shopName + '!');
           }
+        }
+
+        document.getElementById('btn-build-quannet').addEventListener('click', () => {
+          tryBuild('buildQuanNet', 'Quán Nét Cỏ');
+        });
+
+        document.getElementById('btn-build-banquat').addEventListener('click', () => {
+          tryBuild('buildBanQuat', 'Tiệm Quạt OnlyFans');
+        });
+
+        document.getElementById('btn-build-banloa').addEventListener('click', () => {
+          tryBuild('buildBanLoa', 'Tiệm Loa Cho Vợ');
+        });
+
+        document.getElementById('btn-build-banhoa').addEventListener('click', () => {
+          tryBuild('buildBanHoa', 'Tiệm Hoa Tươi');
+        });
+
+        document.getElementById('btn-build-banxe').addEventListener('click', () => {
+          tryBuild('buildBanXe', 'Salon Ô Tô - Xe Máy');
+        });
+
+        document.getElementById('btn-build-stall').addEventListener('click', () => {
+          tryBuild('buildBanhXeo', 'Tiệm Bánh Xèo');
         });
 
         let speedFast = false;

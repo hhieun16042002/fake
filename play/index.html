@@ -42,6 +42,9 @@
       })();
     </script>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <!-- không cho phóng to/thu nhỏ; bàn phím ảo nổi ĐÈ lên game, không co trang lại (interactive-widget) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content" />
     <title>Chơi Đế Chế Vỉa Hè — Game kinh doanh vỉa hè</title>
@@ -58,7 +61,7 @@
     <link rel="apple-touch-icon" href="/play/icons/apple-touch-icon.png" />
     <style>@font-face{font-family:Mali;src:url(/play/fonts/Mali-Bold.ttf)format("truetype");font-weight:700;font-display:block}@font-face{font-family:Mali;src:url(/play/fonts/Mali-SemiBold.ttf)format("truetype");font-weight:600;font-display:block}@font-face{font-family:"Baloo 2";src:url(/play/fonts/Baloo2-Bold.ttf)format("truetype");font-weight:700;font-display:block}html,body{overscroll-behavior:none;touch-action:none;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;background:#2b211b;height:100%;margin:0;overflow:hidden}input{touch-action:manipulation;-webkit-user-select:text;user-select:text;font-size:16px}#app{position:fixed;top:0;bottom:0;left:0;right:0}canvas{display:block}#app canvas{touch-action:none}#safe{pointer-events:none;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);position:fixed;top:0;bottom:0;left:0;right:0}#fps{z-index:5;color:#fff8;pointer-events:none;background:#0006;border-radius:8px;padding:4px 8px;font:12px system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;position:fixed;bottom:10px;right:10px}</style>
     <script type="module" crossorigin src="/play/assets/index-DdpGnxCm.js"></script>
-    <script src="/play/bank-stock.js?v=20261004_1758"></script>
+    <script src="/play/bank-stock.js?v=20261004_1804"></script>
   </head>
   <body>
     <div id="app"></div>
@@ -66,15 +69,15 @@
     <div id="safe"></div>
 
     <!-- Thẻ tên người chơi & Đổi tên nhanh (Đặt dưới tai thỏ / status bar - chỉ hiển thị ở màn hình trang chủ / menu bắt đầu) -->
-    <div id="player-name-tag" style="position:fixed;top:calc(max(env(safe-area-inset-top), 52px) + 12px);left:12px;z-index:99999;background:rgba(26,19,13,0.94);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;border:1.5px solid #e07a5f;backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,0.6);display:flex;align-items:center;gap:6px;user-select:none;touch-action:manipulation;pointer-events:auto;" title="Bấm để đổi tên người chơi">
+    <div id="player-name-tag" onclick="window.openRenameModal && window.openRenameModal(event)" style="position:fixed;top:calc(max(env(safe-area-inset-top), 52px) + 12px);left:12px;z-index:99999;background:rgba(26,19,13,0.94);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:bold;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;border:1.5px solid #e07a5f;backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,0.6);display:flex;align-items:center;gap:6px;user-select:none;touch-action:manipulation;pointer-events:auto;" title="Bấm để đổi tên người chơi">
       <span style="font-size:15px;pointer-events:none;">👤</span>
       <span id="player-name-val" style="pointer-events:none;">fake</span>
       <span style="font-size:12px;color:#f4a261;margin-left:2px;pointer-events:none;">✏️</span>
     </div>
 
     <!-- Modal Đổi Tên Người Chơi (Tương thích 100% Mobile iPhone/Android, không bao giờ bị chặn popup) -->
-    <div id="rename-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:999999;display:none;align-items:center;justify-content:center;padding:16px;-webkit-tap-highlight-color:transparent;">
-      <div style="background:#2b211b;border:2px solid #e07a5f;border-radius:18px;width:100%;max-width:320px;padding:20px;color:#fff;box-shadow:0 12px 35px rgba(0,0,0,0.85);font-family:system-ui,-apple-system,sans-serif;text-align:center;">
+    <div id="rename-modal" onclick="window.closeRenameModal && window.closeRenameModal(event)" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:999999;display:none;align-items:center;justify-content:center;padding:16px;-webkit-tap-highlight-color:transparent;">
+      <div onclick="event.stopPropagation()" style="background:#2b211b;border:2px solid #e07a5f;border-radius:18px;width:100%;max-width:320px;padding:20px;color:#fff;box-shadow:0 12px 35px rgba(0,0,0,0.85);font-family:system-ui,-apple-system,sans-serif;text-align:center;">
         <div style="font-size:18px;font-weight:bold;color:#f4a261;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span>✏️</span> <span>Đổi Tên Người Chơi</span>
         </div>
@@ -83,8 +86,8 @@
         </div>
         <input id="modal-rename-input" type="text" maxlength="25" style="width:100%;box-sizing:border-box;background:#1a130d;border:1.5px solid #f4a261;color:#fff;padding:10px 14px;border-radius:10px;font-size:16px;text-align:center;font-weight:bold;outline:none;margin-bottom:16px;" placeholder="Nhập tên của bạn..." />
         <div style="display:flex;gap:10px;">
-          <button id="modal-rename-cancel" style="flex:1;background:#555;color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;">Hủy</button>
-          <button id="modal-rename-confirm" style="flex:1;background:linear-gradient(135deg, #e07a5f, #e76f51);color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;box-shadow:0 3px 10px rgba(224,122,95,0.4);">Lưu Tên</button>
+          <button id="modal-rename-cancel" onclick="window.closeRenameModal && window.closeRenameModal(event)" style="flex:1;background:#555;color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;">Hủy</button>
+          <button id="modal-rename-confirm" onclick="window.confirmRename && window.confirmRename(event)" style="flex:1;background:linear-gradient(135deg, #e07a5f, #e76f51);color:#fff;border:none;padding:10px 0;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px;box-shadow:0 3px 10px rgba(224,122,95,0.4);">Lưu Tên</button>
         </div>
       </div>
     </div>
@@ -233,10 +236,18 @@
           return n === 'hhieu' || n === 'hhiếu';
         }
 
+        function checkIsPlaying() {
+          if (window.__inGame === true) return true;
+          if (window.__inGame === false) return false;
+          if (window.sim && !window.sim.demo && window.sim.day >= 1) return true;
+          if (window.__game && window.__game.p && !window.__game.p.demo && window.__game.p.day >= 1) return true;
+          return false;
+        }
+
         function updateModVisibility() {
           const name = getPlayerName();
           const allow = isHHieu(name);
-          const isPlaying = window.__inGame === true || !!(window.__game && window.__game.p && !window.__game.p.demo && window.__game.m && !window.__game.m.options?.demo);
+          const isPlaying = checkIsPlaying();
           const isHomeScreen = !isPlaying;
 
           // 1. Quán mới và tiện ích Mod (chỉ hiện khi đang chơi game và là HHieu)
@@ -294,10 +305,20 @@
           }
         }
 
-        function openRenameModal() {
+        let modalOpenedAt = 0;
+        function openRenameModal(e) {
+          if (e) {
+            try { e.preventDefault(); e.stopPropagation(); } catch(err) {}
+          }
+          modalOpenedAt = Date.now();
           const modal = document.getElementById('rename-modal');
           const input = document.getElementById('modal-rename-input');
-          if (!modal || !input) return;
+          if (!modal || !input) {
+            const curr = getPlayerName();
+            const val = prompt('✏️ Nhập tên người chơi mới:', curr);
+            if (val !== null && val.trim()) setPlayerName(val.trim());
+            return;
+          }
           input.value = getPlayerName();
           modal.style.display = 'flex';
           setTimeout(() => {
@@ -305,15 +326,22 @@
               input.focus();
               input.select();
             } catch(e) {}
-          }, 80);
+          }, 50);
         }
 
-        function closeRenameModal() {
+        function closeRenameModal(e) {
+          if (e && e.target && e.target.id === 'rename-modal') {
+            // Chống click ma (ghost click) trên iOS làm tắt modal ngay khi vừa mở
+            if (Date.now() - modalOpenedAt < 500) return;
+          }
           const modal = document.getElementById('rename-modal');
           if (modal) modal.style.display = 'none';
         }
 
-        function confirmRename() {
+        function confirmRename(e) {
+          if (e) {
+            try { e.preventDefault(); e.stopPropagation(); } catch(err) {}
+          }
           const input = document.getElementById('modal-rename-input');
           if (!input) return;
           const clean = input.value.trim();
@@ -329,6 +357,8 @@
         window.setPlayerName = setPlayerName;
         window.doiTen = setPlayerName;
         window.openRenameModal = openRenameModal;
+        window.closeRenameModal = closeRenameModal;
+        window.confirmRename = confirmRename;
         window.promptRename = openRenameModal;
         window.isHHieu = isHHieu;
         window.updateModVisibility = updateModVisibility;
@@ -336,39 +366,22 @@
         const tagEl = document.getElementById('player-name-tag');
         if (tagEl) {
           tagEl.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openRenameModal();
-          });
-          tagEl.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openRenameModal();
+            openRenameModal(e);
           });
         }
 
         const btnRenameEl = document.getElementById('btn-rename');
         if (btnRenameEl) {
           btnRenameEl.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openRenameModal();
-          });
-          btnRenameEl.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openRenameModal();
+            openRenameModal(e);
           });
         }
 
         document.getElementById('modal-rename-confirm')?.addEventListener('click', confirmRename);
         document.getElementById('modal-rename-cancel')?.addEventListener('click', closeRenameModal);
         document.getElementById('modal-rename-input')?.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') confirmRename();
-          if (e.key === 'Escape') closeRenameModal();
-        });
-        document.getElementById('rename-modal')?.addEventListener('click', (e) => {
-          if (e.target.id === 'rename-modal') closeRenameModal();
+          if (e.key === 'Enter') confirmRename(e);
+          if (e.key === 'Escape') closeRenameModal(e);
         });
 
         window.addEventListener('keydown', (e) => {

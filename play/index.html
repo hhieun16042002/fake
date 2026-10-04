@@ -193,16 +193,72 @@
           return false;
         }
 
+        function isHHieu() {
+          try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('user')?.toLowerCase() === 'hhieu' || params.has('hhieu')) return true;
+          } catch(e) {}
+
+          let name = '';
+          if (window.__game && window.__game.p && window.__game.p.playerName) {
+            name = window.__game.p.playerName;
+          } else if (window.sim && window.sim.playerName) {
+            name = window.sim.playerName;
+          }
+          if (!name) {
+            try {
+              const saveStr = localStorage.getItem('de-che-via-he/save/v3');
+              if (saveStr) {
+                const parsed = JSON.parse(saveStr);
+                if (parsed && parsed.playerName) name = parsed.playerName;
+              }
+            } catch(e) {}
+          }
+          if (!name) {
+            try {
+              name = localStorage.getItem('dcvh_player_name') || '';
+            } catch(e) {}
+          }
+          const clean = (name || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return clean === 'hhieu' || clean === 'hieu';
+        }
+
+        window.isHHieu = isHHieu;
+        window.setPlayerName = function(name) {
+          if (!name || !name.trim()) return;
+          const clean = name.trim();
+          try {
+            localStorage.setItem('dcvh_player_name', clean);
+          } catch(e) {}
+          if (window.__game && window.__game.p) {
+            window.__game.p.playerName = clean;
+            if (window.__game.p.hero) window.__game.p.hero.name = clean;
+          }
+          updateModVisibility();
+        };
+
+        window.addEventListener('keydown', (e) => {
+          if ((e.key === 'h' || e.key === 'H') && (e.ctrlKey || e.altKey)) {
+            const current = (window.__game?.p?.playerName || localStorage.getItem('dcvh_player_name') || '');
+            const val = prompt('Tên người chơi:', current);
+            if (val !== null && val.trim()) {
+              window.setPlayerName(val.trim());
+            }
+          }
+        });
+
         function updateModVisibility() {
           const isPlaying = checkIsPlaying();
+          const isUserHHieu = isHHieu();
+          const shouldShowMod = isPlaying && isUserHHieu;
 
-          // 1. Quán mới và tiện ích Mod (chỉ hiện khi đang chơi game trên phố)
+          // 1. Quán mới và tiện ích Mod (chỉ hiện khi đang chơi game trên phố VÀ tên là HHieu)
           const modRoot = document.getElementById('mod-root');
           if (modRoot) {
-            modRoot.style.display = isPlaying ? 'block' : 'none';
+            modRoot.style.display = shouldShowMod ? 'block' : 'none';
           }
           const panel = document.getElementById('mod-panel');
-          if (!isPlaying && panel) {
+          if (!shouldShowMod && panel) {
             panel.style.display = 'none';
           }
 

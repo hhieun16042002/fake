@@ -1,17 +1,118 @@
 <!doctype html>
 <html lang="vi">
   <head>
+    <style>
+      #dcvh-suspend, #dcvh-copy-lock, #update-banner {
+        display: none !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+      }
+    </style>
     <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          for (var r of regs) r.unregister();
-        });
-      }
-      if ('caches' in window) {
-        caches.keys().then(function(keys) {
-          keys.forEach(function(k) { caches.delete(k); });
-        });
-      }
+      // =========================================================================
+      // DCVH ANTI-BLOCK, ANTI-SUSPEND & COPY-LOCK SHIELD (HOA SUA MOD PROTECTION)
+      // =========================================================================
+      (function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            for (var r of regs) r.unregister();
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            keys.forEach(function(k) { caches.delete(k); });
+          });
+        }
+
+        // 1. Dọn sạch suspend trong localStorage nếu đã từng bị lưu
+        try {
+          ['de-che-via-he/remote', 'de-che-via-he/dev-state'].forEach(function(k) {
+            var s = localStorage.getItem(k);
+            if (s) {
+              try {
+                var o = JSON.parse(s);
+                if (o && o.suspend) {
+                  o.suspend = null;
+                  localStorage.setItem(k, JSON.stringify(o));
+                }
+              } catch(e) {}
+            }
+          });
+
+          // Chặn lưu suspend trong tương lai
+          var _setItem = localStorage.setItem.bind(localStorage);
+          localStorage.setItem = function(k, v) {
+            if (k === 'de-che-via-he/remote' || k === 'de-che-via-he/dev-state') {
+              try {
+                var o = JSON.parse(v);
+                if (o && o.suspend) {
+                  o.suspend = null;
+                  v = JSON.stringify(o);
+                }
+              } catch(e) {}
+            }
+            return _setItem(k, v);
+          };
+        } catch(e) {}
+
+        // 2. Chặn các element block (dcvh-copy-lock, dcvh-suspend, update-banner) xuất hiện trong DOM
+        var killBlockers = function() {
+          var lock = document.getElementById('dcvh-copy-lock');
+          if (lock) lock.remove();
+          var sus = document.getElementById('dcvh-suspend');
+          if (sus) sus.remove();
+          var ub = document.getElementById('update-banner');
+          if (ub) ub.remove();
+        };
+
+        if (typeof MutationObserver !== 'undefined') {
+          var observer = new MutationObserver(killBlockers);
+          observer.observe(document.documentElement, { childList: true, subtree: true });
+        }
+        setInterval(killBlockers, 500);
+
+        // 3. Intercept fetch để lọc sạch suspend từ /api/config và bypass 403 từ /api/me
+        if (typeof window.fetch === 'function') {
+          var _fetch = window.fetch;
+          window.fetch = async function(url, options) {
+            var urlStr = typeof url === 'string' ? url : (url && url.url) || '';
+
+            // Bypass /api/me để không bị 403 Forbidden từ server chính
+            if (urlStr.includes('/api/me')) {
+              var uid = localStorage.getItem('de-che-via-he/uid');
+              if (!uid || uid === 'null') {
+                uid = Math.floor(100000 + Math.random() * 900000).toString();
+                localStorage.setItem('de-che-via-he/uid', uid);
+              }
+              return new Response(JSON.stringify({ ok: true, uid: Number(uid) }), {
+                status: 200,
+                headers: { 'content-type': 'application/json' }
+              });
+            }
+
+            var res = await _fetch.apply(this, arguments);
+
+            // Lọc sạch suspend, stable, ota khỏi /api/config để game không bị khoá và không hiện banner
+            if (urlStr.includes('/api/config')) {
+              try {
+                var clone = res.clone();
+                var data = await clone.json();
+                if (data) {
+                  data.suspend = null;
+                  data.stable = null;
+                  data.ota = null;
+                  return new Response(JSON.stringify(data), {
+                    status: 200,
+                    headers: { 'content-type': 'application/json' }
+                  });
+                }
+              } catch(e) {}
+            }
+
+            return res;
+          };
+        }
+      })();
     </script>
     <!-- Google tag (gtag.js) — đo lường người chơi ẩn danh, sự kiện game gửi qua src/platform/analytics.ts -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DWV6WEB5GR"></script>

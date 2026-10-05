@@ -1,0 +1,1 @@
+import{n as e,t}from"./main-7GuCXAIG.js";export{t as checkNativeUpdate,e as nativeChannel};

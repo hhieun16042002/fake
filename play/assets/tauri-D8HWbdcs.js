@@ -1,5 +1,5 @@
 const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/dist-js-x-r_bAJk.js","assets/core-CFox_exR.js"])))=>i.map(i=>d[i]);
-import{t as e}from"./index-DdpGnxCm.js";import{n as t,r as n}from"./worldJson-DSgq5HsZ.js";var r=`CREATE TABLE IF NOT EXISTS schema_migrations(version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at INTEGER NOT NULL)`,i=[{version:1,name:`bảng saves, backups, kv`,sql:[`CREATE TABLE IF NOT EXISTS saves(
+import{a as e}from"./index-BJ6vljbz.js";import{n as t,r as n}from"./worldJson-DSgq5HsZ.js";var r=`CREATE TABLE IF NOT EXISTS schema_migrations(version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at INTEGER NOT NULL)`,i=[{version:1,name:`bảng saves, backups, kv`,sql:[`CREATE TABLE IF NOT EXISTS saves(
         slot TEXT PRIMARY KEY,
         v INTEGER NOT NULL DEFAULT 0,
         day INTEGER NOT NULL DEFAULT 0,
